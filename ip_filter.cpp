@@ -93,7 +93,7 @@ auto _filter(ip_list list, ip_t::size_type) {
 template <typename T, typename ...Args>
 auto _filter(ip_list list, ip_t::size_type cnt, T val, Args... args) {
     decltype (list) ip1 = _filter(list, cnt+1, args...);
-    //или можно было бы
+    //или можно было бы без конечной функции:
     //decltype (list) ip1;
     //if(cnt == list.size() - 1) ip1 = list;
     //else ip1 = _filter(list, cnt+1, args...);

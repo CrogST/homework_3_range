@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(h02_ip_filter)
+project(homework_2_ip_filter)
 
 add_executable(ip_filter
     ip_filter.cpp
+    .travis.yml
 )
 
 set_target_properties(ip_filter PROPERTIES
@@ -38,3 +39,13 @@ set_target_properties(ip_filter PROPERTIES
 #enable_testing()
 
 #add_test(helloworld_tests test_version)
+
+#настройка создания пакета
+install(TARGETS ip_filter RUNTIME DESTINATION bin)
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_CONTACT my_mail@some_mail.com)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+include(CPack)
