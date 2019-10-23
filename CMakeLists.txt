@@ -26,7 +26,8 @@ set_target_properties(${PROJECT_NAME} ip_lib tests PROPERTIES
 )
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-set_target_properties(tests PROPERTIES
+set_target_properties(tests
+    PROPERTIES
     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
