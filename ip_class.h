@@ -19,10 +19,9 @@ class ip_class {
     static auto _filter(ip_list list, ip_t::size_type oct_ind, T val, Args... args) {
         ip_list ip_list1 = _filter(list, oct_ind+1, args...);
         ip_list ip_list2;
-        for(const auto & ip : ip_list1) {
-            if(ip[oct_ind] == val)
-                ip_list2.push_back(ip);
-        }
+        std::copy_if(ip_list1.begin(), ip_list1.end(), std::back_inserter(ip_list2), [oct_ind, val](ip_t ip) {
+            return ip[oct_ind] == val;
+        });
         return ip_list2;
     }
 
