@@ -37,7 +37,11 @@ int main()
         for(std::string line; std::getline(std::cin, line);)
         {
             auto v = split(line, '\t');
-            ip_pool.push_back(split(v.at(0), '.'));
+            auto ip_str = split(v.at(0), '.');
+            ip_t ip;
+            for(const auto & s : ip_str)
+                ip.push_back(std::stoi(s));
+            ip_pool.push_back(ip);
         }
 
         //вывод списка адресов
