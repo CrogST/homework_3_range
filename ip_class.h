@@ -2,6 +2,9 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
 
 using ip_t = std::vector<int>;
 using ip_list = std::vector<ip_t>;
@@ -37,17 +40,15 @@ public:
     }
 
     static auto filter_any(ip_list list, int val) {
-        decltype (list) list_out;
-        //пробегаемся по ip
-        for(const auto & ip : list) {
-            //пробегаемся по элементам текущего ip
-            for(const auto & n : ip) {
-                if(n == val) {
-                    list_out.push_back(ip);
-                    break;
-                }
-            }
-        }
+        ip_list list_out;
+        auto cmp_oct = [val](int oct) {
+            return (oct == val);
+        };
+        auto cmp_ip = [val, &cmp_oct](ip_t ip)
+        {
+            return std::any_of(ip.begin(), ip.end(), cmp_oct);
+        };
+        std::copy_if(list.begin(), list.end(), std::back_inserter(list_out), cmp_ip);
         return list_out;
     }
 
