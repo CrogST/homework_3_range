@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-#include <optional>
 
 using ip_t = std::vector<int>;
 using ip_list = std::vector<ip_t>;
