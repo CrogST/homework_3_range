@@ -5,33 +5,43 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <optional>
 
 using ip_t = std::vector<int>;
 using ip_list = std::vector<ip_t>;
+using ip_list_iter = ip_list::iterator;
+using filter_res = std::pair<ip_list_iter, ip_list_iter>;
 
 class ip_class {
 
-    static auto _filter(ip_list list, ip_t::size_type) {
-        return list;
+    static auto vt_filter(ip_list_iter begin, ip_list_iter end, ip_t::size_type) {
+        return filter_res(begin, end);
     }
 
     template <typename T, typename ...Args>
-    static auto _filter(ip_list list, ip_t::size_type oct_ind, T val, Args... args) {
-        ip_list ip_list1 = _filter(list, oct_ind+1, args...);
-        ip_list ip_list2;
-        std::copy_if(ip_list1.begin(), ip_list1.end(), std::back_inserter(ip_list2), [oct_ind, val](ip_t ip) {
-            return ip[oct_ind] == val;
+    static auto vt_filter(ip_list_iter begin, ip_list_iter end, ip_t::size_type oct_ind, T val, Args... args) {
+
+        //ищем первый ip, октет которого меньше, либо равен искомому значению
+        auto low_iter = std::upper_bound(begin, end, ip_t{}, [oct_ind, val](const auto &, const auto & it) {
+            return it[oct_ind] <= val;
         });
-        return ip_list2;
+        //проверяем, что у найденного ip октет равен. Иначе - результат пустой.
+        if((*low_iter)[oct_ind] != val) return filter_res(begin, begin);
+
+        //ищем первый ip, октет которого меньше искомого значения
+        auto upper_iter =
+                std::upper_bound(begin, end, ip_t{}, [oct_ind, val](const auto &, const auto & it) {
+            return it[oct_ind] < val;
+        });
+
+        return vt_filter(low_iter, upper_iter, oct_ind+1, args...);
     }
 
 public:
 
-    static bool ip_cmp(ip_t a, ip_t b);
-
     template <typename ...Args>
-    static auto filter(ip_list list, Args... args) {
-        return _filter(list, 0, args...);
+    static auto filter(ip_list & list, Args... args) {
+        return vt_filter(list.begin(), list.end(), 0, args...);
     }
 
     static auto filter_any(ip_list list, int val) {
@@ -39,7 +49,7 @@ public:
         auto cmp_oct = [val](int oct) {
             return (oct == val);
         };
-        auto cmp_ip = [val, &cmp_oct](ip_t ip)
+        auto cmp_ip = [&cmp_oct](ip_t ip)
         {
             return std::any_of(ip.begin(), ip.end(), cmp_oct);
         };

@@ -7,6 +7,8 @@
 
 #include "ip_class.h"
 
+static const bool debug = false;
+
 auto split(const std::string &str, char delim)
 {
     std::vector<std::string> r;
@@ -32,47 +34,60 @@ int main()
     {
         ip_list ip_pool;
 
-        //чтение файла построчно
-        //формирование вектора ip адресов.
-        for(std::string line; std::getline(std::cin, line);)
-        {
-            auto v = split(line, '\t');
-            auto ip_str = split(v.at(0), '.');
-            ip_t ip;
-            for(const auto & s : ip_str)
-                ip.push_back(std::stoi(s));
-            ip_pool.push_back(ip);
+        if constexpr(!debug) {
+            //чтение файла построчно
+            //формирование вектора ip адресов.
+            for(std::string line; std::getline(std::cin, line);)
+            {
+                auto v = split(line, '\t');
+                auto ip_str = split(v.at(0), '.');
+                ip_t ip;
+                for(const auto & s : ip_str)
+                    ip.push_back(std::stoi(s));
+                ip_pool.push_back(ip);
+            }
+        } else { //отладка
+            ip_pool = {
+                {1,1,1,1},
+                {46,70,2,1},
+                {46,3,46,2},
+                {1,1,1,46},
+                {46,70,4,46},
+                {1,1,3,3},
+                {2,3,3,1}
+            };
         }
 
         //вывод списка адресов
-        auto ip_list_out = [](ip_list ip_pool) {
-            for(auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+        auto ip_list_out = [](auto start, auto stop) {
+            for(auto ip = start; ip < stop; ++ip)
             {
-                for(auto ip_part = ip->cbegin(); ip_part != ip->cend(); ++ip_part)
+                for(auto ip_oct = ip->begin(); ip_oct != ip->end(); ++ip_oct)
                 {
-                    if (ip_part != ip->cbegin())
-                    {
+                    if (ip_oct != ip->begin())
                         std::cout << ".";
-
-                    }
-                    std::cout << *ip_part;
+                    std::cout << *ip_oct;
                 }
                 std::cout << std::endl;
             }
         };
 
         // reverse lexicographically sort
-        std::sort(ip_pool.begin(), ip_pool.end(), ip_class::ip_cmp);
-        ip_list_out(ip_pool);
+        std::sort(ip_pool.begin(), ip_pool.end(),
+                  [](auto & ip1, auto & ip2) { return ip1 > ip2; });
+        ip_list_out(ip_pool.begin(), ip_pool.end());
 
-        auto ip_filter = ip_class::filter(ip_pool, 1);
-        ip_list_out(ip_filter);
+        if(debug) std::cout << std::endl << "filter 1:" << std::endl;
+        auto res = ip_class::filter(ip_pool, 1);
+        ip_list_out(std::get<0>(res), std::get<1>(res));
 
-        ip_filter = ip_class::filter(ip_pool, 46, 70);
-        ip_list_out(ip_filter);
+        if(debug) std::cout << std::endl << "filter 2:" << std::endl;
+        res = ip_class::filter(ip_pool, 46, 70);
+        ip_list_out(std::get<0>(res), std::get<1>(res));
 
-        ip_filter = ip_class::filter_any(ip_pool, 46);
-        ip_list_out(ip_filter);
+        if(debug) std::cout << std::endl << "filter 3:" << std::endl;
+        auto res_any = ip_class::filter_any(ip_pool, 46);
+        ip_list_out(res_any.begin(), res_any.end());
     }
     catch(const std::exception &e)
     {

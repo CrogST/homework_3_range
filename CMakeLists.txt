@@ -6,20 +6,16 @@ endif()
 
 project(ip_filter VERSION 0.0.0$ENV{TRAVIS_BUILD_NUMBER})
 
-add_executable(ip_filter
+add_executable(${PROJECT_NAME}
     ip_filter.cpp
     .travis.yml
-)
-
-add_library(ip_lib
-    ip_class.cpp
 )
 
 add_executable(Tests
     "test.cpp"
 )
 
-set_target_properties(${PROJECT_NAME} ip_lib Tests PROPERTIES
+set_target_properties(${PROJECT_NAME} Tests PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
@@ -32,20 +28,15 @@ set_target_properties(Tests
     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
-target_link_libraries(${PROJECT_NAME}
-    ip_lib
-)
-
 target_link_libraries(Tests
     ${Boost_LIBRARIES}
-    ip_lib
 )
 
 enable_testing()
 add_test(ip_filter_tests Tests)
 
 #настройка создания пакета
-install(TARGETS ip_filter RUNTIME DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
