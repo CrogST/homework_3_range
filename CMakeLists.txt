@@ -4,7 +4,7 @@ if(NOT DEFINED ENV{TRAVIS_BUILD_NUMBER})
     set(ENV{TRAVIS_BUILD_NUMBER} 1)
 endif()
 
-project(ip_filter VERSION 0.0.0$ENV{TRAVIS_BUILD_NUMBER})
+project(h03_range VERSION 0.0.0$ENV{TRAVIS_BUILD_NUMBER})
 
 add_executable(${PROJECT_NAME}
     ip_filter.cpp
